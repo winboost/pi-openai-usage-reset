@@ -48,7 +48,7 @@ function formatResetTime(resetAtMs) {
 function formatPercentLeft(usedPercent) {
 	const leftPercent = Math.max(0, Math.min(100, 100 - usedPercent));
 	const decimals = leftPercent >= 10 ? 0 : 1;
-	return `${leftPercent.toFixed(decimals)}% left`;
+	return `${leftPercent.toFixed(decimals)}% Left`;
 }
 
 function isSupportedModel(model) {
@@ -138,18 +138,20 @@ export default function openAIUsageResetExtension(pi) {
 		}
 
 		const parts = [
-			lastPrimaryResetAtMs !== undefined ? `5h ${formatResetTime(lastPrimaryResetAtMs)}` : "5h [after first response]",
+			lastPrimaryResetAtMs !== undefined ? `5h Reset: ${formatResetTime(lastPrimaryResetAtMs)}` : "5h Reset: [After First Response]",
 		];
 
 		if (lastSecondaryUsedPercent !== undefined) {
-			parts.push(`7d ${formatPercentLeft(lastSecondaryUsedPercent)}`);
+			parts.push(`7d: ${formatPercentLeft(lastSecondaryUsedPercent)}`);
 		} else if (usageFetchState === "loading") {
-			parts.push("7d [fetching…]");
+			parts.push("7d: [Fetching…]");
+		} else if (usageFetchState === "idle") {
+			parts.push("7d: [After First Response]");
 		}
 
 		const theme = ctx.ui.theme;
 		const clock = theme.fg("accent", "◷");
-		const text = theme.fg("dim", ` OpenAI Usage: ${parts.join(" · ")}`);
+		const text = theme.fg("dim", ` OpenAI Usage · ${parts.join(" · ")}`);
 		ctx.ui.setStatus(STATUS_KEY, clock + text);
 	}
 
